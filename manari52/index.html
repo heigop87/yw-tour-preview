@@ -88,7 +88,7 @@ body.embed .fs{display:grid}
   .top .title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .views button{padding:6px 11px;white-space:nowrap}
   .brand{right:14px;bottom:16px;height:20px}
-  .pbox{overflow:hidden;border-radius:14px}
+  .pbox.z{overflow:hidden;border-radius:14px}  /* clip only while zoomed, so the shadow and view cone stay soft at 1x */
   .plan{width:max-content;touch-action:none;transform-origin:0 0;transform:translate(var(--tx,0px),var(--ty,0px)) scale(var(--k,1))}
   .plan .pin{transform:scale(calc(1 / var(--k,1)))}
 }
@@ -377,7 +377,7 @@ function setZoom(nk, mx, my) {  // mx,my: point in the plan's own box that stays
   tx = mx - (mx - tx) * nk / k; ty = my - (my - ty) * nk / k; k = nk;
   const w = planEl.offsetWidth, h = planEl.offsetHeight;  // keep the zoomed plan filling its box
   const bw = Math.min(w * k, innerWidth - 24);  // zoomed, the box grows sideways up to the screen width
-  document.getElementById('pbox').style.width = k > 1 ? bw + 'px' : '';
+  const pb = document.getElementById('pbox'); pb.style.width = k > 1 ? bw + 'px' : ''; pb.classList.toggle('z', k > 1);
   tx = Math.min(0, Math.max(bw - w * k, tx)); ty = Math.min(0, Math.max(h * (1 - k), ty));
   planEl.style.setProperty('--k', k); planEl.style.setProperty('--tx', tx + 'px'); planEl.style.setProperty('--ty', ty + 'px');
 }
