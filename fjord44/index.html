@@ -28,8 +28,10 @@ html,body{margin:0;height:100%;background:#000;font-family:Figtree,system-ui,san
 .views button{font:500 13px Figtree,sans-serif;color:#a1a1aa;background:transparent;border:0;padding:6px 14px;border-radius:999px;cursor:pointer}
 .views button.on{color:#111;background:#fff}
 .top .spot{margin-left:0}
-body.owner .top{right:456px}
-body.owner .brand{right:460px}
+body.owner .top,body.names .top{right:456px}
+body.owner .brand,body.names .brand{right:460px}
+.views button[data-v=names]{display:none}
+body.can-name .views button[data-v=names]{display:block}
 .brand{position:fixed;right:24px;bottom:22px;z-index:10;height:26px;opacity:.92;pointer-events:none}
 #map{--h:min(58vh,520px);position:fixed;left:20px;bottom:20px;z-index:10;display:flex;flex-direction:column;align-items:center;gap:10px}
 .floors{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--glass);backdrop-filter:blur(14px)}
@@ -80,7 +82,7 @@ body.owner .brand{right:460px}
 </head>
 <body>
 <div id="viewer"></div>
-<div class="top"><span class="title" id="title"></span><div class="views" id="views"><button data-v="guest">Guest view</button><button data-v="owner">Owner view</button></div><span class="spot" id="spot"></span></div>
+<div class="top"><span class="title" id="title"></span><div class="views" id="views"><button data-v="guest">Guest view</button><button data-v="owner">Owner view</button><button data-v="names">Names</button></div><span class="spot" id="spot"></span></div>
 <img class="brand" src="logo.svg" alt="YachtWay">
 <div id="map"><div class="plan" id="plan"><img id="planImg" alt=""><svg class="cone" id="cone" viewBox="-80 -80 160 160"><defs><radialGradient id="cg" cx="0" cy="0" r="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="hsl(264.5638 84.1808% 34.7059%)" stop-opacity=".38"/><stop offset="1" stop-color="hsl(264.5638 84.1808% 34.7059%)" stop-opacity="0"/></radialGradient></defs><path d="M0 0 L-39.6 -39.6 A56 56 0 0 1 39.6 -39.6 Z" fill="url(#cg)"/></svg><div class="tip" id="tip"></div><button class="hide" id="hide" aria-label="Hide deck plan"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2.5 4.5 7 9 11.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="floors" id="floors"></div><button class="close" id="close" aria-label="Close deck plan"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
 <script type="module">
@@ -245,7 +247,7 @@ const SID = Math.random().toString(36).slice(2, 10);
 const VID = localStorage.yw_vid ||= Math.random().toString(36).slice(2, 10);  // same browser across visits
 let buf = [];
 setInterval(() => {
-  if (document.hidden || !cur || mapEl.classList.contains('big') || owner) return;
+  if (document.hidden || !cur || mapEl.classList.contains('big') || document.body.matches('.owner,.names')) return;
   const p = viewer.getPosition();
   buf.push([cur, Math.round(p.yaw * 1800 / Math.PI) / 10, Math.round(p.pitch * 1800 / Math.PI) / 10]);
 }, 1000);
@@ -259,20 +261,23 @@ addEventListener('pagehide', flush);
 document.addEventListener('visibilitychange', () => document.hidden && flush());
 
 // guest / owner switch; owner view loads the analytics panel (sign-in gated in production)
-let owner = false, ownerMod = null;
+// names: photographer tool for naming spots, only offered when the link has ?view=names
+let ownerMod = null, namesMod = null;
 async function setView(v) {
-  owner = v === 'owner';
   document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
-  document.body.classList.toggle('owner', owner);
-  const u = new URL(location); owner ? u.searchParams.set('view', 'owner') : u.searchParams.delete('view'); history.replaceState(null, '', u);
-  if (owner && !ownerMod) ownerMod = await import('./owner.js');
-  ownerMod?.toggle(owner);
+  document.body.classList.toggle('owner', v === 'owner');
+  document.body.classList.toggle('names', v === 'names');
+  const u = new URL(location); v === 'guest' ? u.searchParams.delete('view') : u.searchParams.set('view', v); history.replaceState(null, '', u);
+  if (v === 'owner' && !ownerMod) ownerMod = await import('./owner.js');
+  if (v === 'names' && !namesMod) namesMod = await import('./names.js');
+  ownerMod?.toggle(v === 'owner');
+  namesMod?.toggle(v === 'names');
 }
 document.querySelectorAll('#views button').forEach(b => b.onclick = () => setView(b.dataset.v));
 window.tour = { T, viewer, go, updateCone, get cur() { return cur; }, get deck() { return shownDeck; },
-  setPanoFor(f) { panoFor = f; }, async reload() { const p = viewer.getPosition(); await viewer.setPanorama(await panoFor(cur), { transition: { speed: 300, rotation: false, effect: 'fade' }, showLoader: false, position: p }); } };
+  setPanoFor(f) { panoFor = f; }, relabel() { setLinks(T.scenes[cur]); document.getElementById('spot').textContent = T.scenes[cur].name; }, async reload() { const p = viewer.getPosition(); await viewer.setPanorama(await panoFor(cur), { transition: { speed: 300, rotation: false, effect: 'fade' }, showLoader: false, position: p }); } };
 
-viewer.addEventListener('ready', async () => { await go(T.first, true); setView(new URLSearchParams(location.search).get('view') === 'owner' ? 'owner' : 'guest'); }, { once: true });
+viewer.addEventListener('ready', async () => { await go(T.first, true); const v = new URLSearchParams(location.search).get('view'); document.body.classList.toggle('can-name', v === 'names'); setView(['owner', 'names'].includes(v) ? v : 'guest'); }, { once: true });
 </script>
 </body>
 </html>
