@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Measure log | YachtWay</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f2f5;--group:#fff;--fill:rgba(118,118,128,.12);--label:#121216;--label2:#727279;--sep:rgba(60,60,67,.12);--tint:#4b0ea3;--tintFill:#f3edfb;--green:#067647}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--label);font:15px/20px Figtree,system-ui,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+main{max-width:520px;margin:0 auto;padding:24px 16px 120px}
+h1{font:600 28px/34px Poppins,sans-serif;margin:0 0 4px}
+.sub{color:var(--label2);margin:0 0 20px;font-size:13px;line-height:18px}
+.card{background:var(--group);border-radius:16px;padding:16px;margin:0 0 16px}
+label{display:block;font-size:13px;color:var(--label2);margin:0 0 6px}
+input.boat{width:100%;border:0;border-radius:10px;background:var(--fill);padding:10px 12px;font:15px Figtree,sans-serif;color:var(--label)}
+.live{display:flex;align-items:center;gap:12px}
+.dot{width:12px;height:12px;border-radius:50%;background:#c7c7cc;flex:none}
+.live.on .dot{background:var(--green);box-shadow:0 0 0 4px rgba(6,118,71,.15)}
+.live b{font:600 17px/22px Figtree,sans-serif}
+.live span{display:block;color:var(--label2);font-size:13px}
+#cap{position:absolute;opacity:0;width:1px;height:1px;left:-10px}
+.last{font:600 44px/52px Poppins,sans-serif;margin:12px 0 0}
+.last small{font:500 17px Figtree,sans-serif;color:var(--label2);margin-left:4px}
+ol{list-style:none;margin:0;padding:0}
+li{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--sep)}
+li:last-child{border:0}
+li .t{color:var(--label2);font-size:13px}
+.empty{color:var(--label2);padding:8px 0}
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:rgba(242,242,245,.9);backdrop-filter:blur(14px);display:flex;gap:8px;max-width:520px;margin:0 auto}
+button{flex:1;min-height:48px;border:0;border-radius:12px;font:600 15px Figtree,sans-serif;cursor:pointer;background:var(--tintFill);color:var(--tint)}
+button.f{background:var(--tint);color:#fff}
+.manual{display:flex;gap:8px;margin:12px 0 0}
+.manual input{flex:1;border:0;border-radius:10px;background:var(--fill);padding:10px 12px;font:15px Figtree,sans-serif}
+.manual button{flex:none;min-height:40px;padding:0 16px}
+</style>
+</head>
+<body>
+<main>
+<h1>Measure log</h1>
+<p class="sub">Pair the Disto in keyboard mode, then just measure. Every reading is saved here with its time. Rooms are matched to the photos later, by time.</p>
+
+<div class="card">
+  <label for="boat">Boat</label>
+  <input class="boat" id="boat" placeholder="Manari 52, Miami Beach Marina" autocomplete="off">
+</div>
+
+<div class="card" id="tap">
+  <div class="live" id="live"><i class="dot"></i><div><b id="state">Tap here to start</b><span id="hint">The Disto types into this page while it is open</span></div></div>
+  <div class="last" id="last"></div>
+  <div class="manual"><input id="man" inputmode="decimal" placeholder="Type a reading"><button id="add">Add</button></div>
+</div>
+
+<div class="card"><ol id="list"></ol></div>
+</main>
+<input id="cap" autocomplete="off" autocorrect="off" spellcheck="false">
+<div class="bar"><button id="undo">Undo last</button><button class="f" id="exp">Export raw file</button></div>
+
+<script>
+// raw log only: time, value, unit, exactly what the Disto sent. Mapping to rooms happens later against the photo capture times.
+const KEY = 'yw-disto-log';
+let log = JSON.parse(localStorage.getItem(KEY) || '[]');
+const boat = document.getElementById('boat'), cap = document.getElementById('cap');
+boat.value = localStorage.getItem(KEY + '-boat') || '';
+boat.oninput = () => localStorage.setItem(KEY + '-boat', boat.value);
+const save = () => localStorage.setItem(KEY, JSON.stringify(log));
+const time = t => new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+function parse(raw) {  // "2.347 m", "2,347", "92.4 in", "7' 8 1/2\"" -> value + unit, raw kept as sent
+  const s = raw.trim(), m = s.replace(',', '.').match(/-?\d+(\.\d+)?/);
+  const unit = /mm/i.test(s) ? 'mm' : /cm/i.test(s) ? 'cm' : /in|"/i.test(s) ? 'in' : /ft|'/i.test(s) ? 'ft' : 'm';
+  return { t: new Date().toISOString(), v: m ? +m[0] : null, unit, raw: s };
+}
+function add(raw) {
+  if (!raw.trim()) return;
+  log.push(parse(raw)); save(); draw();
+  document.getElementById('hint').textContent = `${log.length} readings saved`;
+  navigator.vibrate?.(30);
+}
+function draw() {
+  const l = log[log.length - 1];
+  document.getElementById('last').innerHTML = l ? `${l.v ?? l.raw}<small>${l.unit}</small>` : '';
+  document.getElementById('list').innerHTML = log.length ? log.map((r, i) => `<li><span>${i + 1}. ${r.v ?? r.raw} ${r.unit}</span><span class="t">${time(r.t)}</span></li>`).reverse().join('') : '<li class="empty">No readings yet.</li>';
+}
+
+// the Disto sends the reading followed by Enter (or Tab), like a keyboard
+let buf = '';
+cap.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); add(buf || cap.value); buf = ''; cap.value = ''; }
+});
+cap.addEventListener('input', () => { buf = cap.value; });
+const listen = () => { cap.focus(); };
+cap.onfocus = () => { document.getElementById('live').classList.add('on'); document.getElementById('state').textContent = 'Listening for the Disto'; document.getElementById('hint').textContent = `${log.length} readings saved`; };
+cap.onblur = () => { document.getElementById('live').classList.remove('on'); document.getElementById('state').textContent = 'Tap here to keep listening'; };
+document.getElementById('tap').addEventListener('click', e => { if (!e.target.closest('.manual')) listen(); });
+
+const man = document.getElementById('man');
+document.getElementById('add').onclick = () => { add(man.value); man.value = ''; };
+man.onkeydown = e => { if (e.key === 'Enter') { add(man.value); man.value = ''; } };
+
+document.getElementById('undo').onclick = () => { if (log.length && confirm('Remove the last reading?')) { log.pop(); save(); draw(); } };
+document.getElementById('exp').onclick = async () => {
+  const body = JSON.stringify({ boat: boat.value, device_tz: Intl.DateTimeFormat().resolvedOptions().timeZone, exported: new Date().toISOString(), readings: log }, null, 1);
+  const name = `measure-${(boat.value || 'boat').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-${new Date().toISOString().slice(0, 10)}.json`;
+  const file = new File([body], name, { type: 'application/json' });
+  if (navigator.canShare?.({ files: [file] })) { try { await navigator.share({ files: [file], title: name }); return; } catch (e) { if (e.name === 'AbortError') return; } }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(file); a.download = name; a.click();
+};
+draw();
+</script>
+</body>
+</html>
