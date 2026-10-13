@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
 <meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Virtual tour | YachtWay</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,8 +28,8 @@ html,body{margin:0;height:100%;background:#000;font-family:Figtree,system-ui,san
 .views button{font:500 13px Figtree,sans-serif;color:#a1a1aa;background:transparent;border:0;padding:6px 14px;border-radius:999px;cursor:pointer}
 .views button.on{color:#111;background:#fff}
 .top .spot{margin-left:0}
-body.owner .top{right:436px}
-body.owner .brand{right:440px}
+body.owner .top{right:456px}
+body.owner .brand{right:460px}
 .brand{position:fixed;right:24px;bottom:22px;z-index:10;height:26px;opacity:.92;pointer-events:none}
 #map{--h:min(58vh,520px);position:fixed;left:20px;bottom:20px;z-index:10;display:flex;flex-direction:column;align-items:center;gap:10px}
 .floors{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--glass);backdrop-filter:blur(14px)}
@@ -66,6 +66,7 @@ body.owner .brand{right:440px}
 .plan img{display:block;height:100%;width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
 .pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;border:2px solid #3f3f46;cursor:pointer;padding:0;transition:transform .15s}
 .pin:hover{transform:scale(1.3)}
+.pin.hl{transform:scale(1.5);background:#fde047;border-color:#fff;box-shadow:0 0 0 6px rgba(253,224,71,.35)}
 .pin.on{background:var(--primary);border-color:#fff;width:18px;height:18px;margin:-9px 0 0 -9px;box-shadow:0 0 0 4px rgba(84,13,163,.25)}
 .cone{position:absolute;width:160px;height:160px;margin:-80px 0 0 -80px;pointer-events:none;z-index:1;display:none}
 .cone.show{display:block}
@@ -112,7 +113,7 @@ function showDeck(id) {
     b.className = 'pin' + (s.id === cur ? ' on' : '');
     b.style.left = (s.map[0] / d.w * 100) + '%';
     b.style.top = (s.map[1] / d.h * 100) + '%';
-    b.setAttribute('aria-label', s.name);
+    b.setAttribute('aria-label', s.name); b.dataset.id = s.id;
     b.onmouseenter = () => { const t = document.getElementById('tip'); t.textContent = s.name; t.style.left = b.style.left; t.style.top = b.style.top; t.classList.add('show'); };
     b.onmouseleave = () => document.getElementById('tip').classList.remove('show');
     b.onclick = e => { e.stopPropagation(); closeBig(); go(s.id); };
