@@ -1,0 +1,236 @@
+{
+ "title": "Fjord 44 Open",
+ "first": "CAM06625G6-PR0014-PAN006",
+ "decks": [
+  {
+   "id": "0",
+   "label": "Deck",
+   "w": 432,
+   "h": 1400
+  },
+  {
+   "id": "-1",
+   "label": "Below deck",
+   "w": 432,
+   "h": 1400
+  }
+ ],
+ "scenes": {
+  "CAM06625G6-PR0014-PAN006": {
+   "id": "CAM06625G6-PR0014-PAN006",
+   "name": "Aft deck",
+   "deck": "0",
+   "file": "Aft_deck_PAN006.jpg",
+   "rot": 92.51,
+   "map": [
+    231.2,
+    1321.1
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0014-PAN010",
+     "yaw": 12.9,
+     "pitch": -18.0
+    }
+   ]
+  },
+  "CAM06625G6-PR0014-PAN007": {
+   "id": "CAM06625G6-PR0014-PAN007",
+   "name": "Galley area",
+   "deck": "0",
+   "file": "Galley_area_PAN007.jpg",
+   "rot": 84.88,
+   "map": [
+    191.9,
+    819.4
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0014-PAN008",
+     "yaw": -13.3,
+     "pitch": -44.0
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN010",
+     "yaw": 119.7,
+     "pitch": -31.2
+    }
+   ]
+  },
+  "CAM06625G6-PR0014-PAN008": {
+   "id": "CAM06625G6-PR0014-PAN008",
+   "name": "Helm",
+   "deck": "0",
+   "file": "Helm_PAN008.jpg",
+   "rot": 87.8,
+   "map": [
+    189.2,
+    690.9
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0014-PAN007",
+     "yaw": 169.6,
+     "pitch": -44.0
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN010",
+     "yaw": 140.4,
+     "pitch": -22.0
+    }
+   ]
+  },
+  "CAM06625G6-PR0014-PAN009": {
+   "id": "CAM06625G6-PR0014-PAN009",
+   "name": "Bow lounge",
+   "deck": "0",
+   "file": "Bow_lounge_PAN009.jpg",
+   "rot": 40.05,
+   "map": [
+    221.0,
+    169.4
+   ],
+   "links": []
+  },
+  "CAM06625G6-PR0014-PAN010": {
+   "id": "CAM06625G6-PR0014-PAN010",
+   "name": "Dining",
+   "deck": "0",
+   "file": "Dining_PAN010.jpg",
+   "rot": 94.99,
+   "map": [
+    345.1,
+    956.3
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0014-PAN007",
+     "yaw": -50.2,
+     "pitch": -31.2
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN008",
+     "yaw": -32.4,
+     "pitch": -22.0
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN006",
+     "yaw": -164.7,
+     "pitch": -18.0
+    }
+   ]
+  },
+  "CAM06625G6-PR0014-PAN001": {
+   "id": "CAM06625G6-PR0014-PAN001",
+   "name": "Owners cabin",
+   "deck": "-1",
+   "file": "Owners_cabin_PAN001.jpg",
+   "rot": 87.26,
+   "map": [
+    216.3,
+    439.5
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0014-PAN002",
+     "yaw": 176.2,
+     "pitch": -51.4
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN003",
+     "yaw": 142.9,
+     "pitch": -37.5
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN004",
+     "yaw": 166.8,
+     "pitch": -23.8
+    }
+   ]
+  },
+  "CAM06625G6-PR0014-PAN002": {
+   "id": "CAM06625G6-PR0014-PAN002",
+   "name": "Below deck",
+   "deck": "-1",
+   "file": "Below_deck_PAN002.jpg",
+   "rot": 52.06,
+   "map": [
+    205.9,
+    538.3
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0014-PAN003",
+     "yaw": 73.0,
+     "pitch": -52.4
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN001",
+     "yaw": -39.0,
+     "pitch": -51.4
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN004",
+     "yaw": 126.5,
+     "pitch": -34.0
+    }
+   ]
+  },
+  "CAM06625G6-PR0014-PAN003": {
+   "id": "CAM06625G6-PR0014-PAN003",
+   "name": "Dry head",
+   "deck": "-1",
+   "file": "Dry_head_PAN003.jpg",
+   "rot": 341.41,
+   "map": [
+    290.5,
+    583.2
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0014-PAN002",
+     "yaw": -177.6,
+     "pitch": -52.4
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN004",
+     "yaw": 87.0,
+     "pitch": -39.8
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN001",
+     "yaw": -142.9,
+     "pitch": -37.5
+    }
+   ]
+  },
+  "CAM06625G6-PR0014-PAN004": {
+   "id": "CAM06625G6-PR0014-PAN004",
+   "name": "Guest cabin",
+   "deck": "-1",
+   "file": "Guest_cabin_PAN004.jpg",
+   "rot": 270.3,
+   "map": [
+    233.4,
+    720.8
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0014-PAN003",
+     "yaw": -164.1,
+     "pitch": -39.8
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN002",
+     "yaw": 164.7,
+     "pitch": -34.0
+    },
+    {
+     "id": "CAM06625G6-PR0014-PAN001",
+     "yaw": 169.8,
+     "pitch": -23.8
+    }
+   ]
+  }
+ }
+}

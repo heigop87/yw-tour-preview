@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Virtual tour | YachtWay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Poppins:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.15.1/index.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5.15.1/index.css">
+<script type="importmap">
+{"imports":{
+ "three":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+ "@photo-sphere-viewer/core":"https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5.15.1/index.module.js",
+ "@photo-sphere-viewer/markers-plugin":"https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5.15.1/index.module.js"
+}}
+</script>
+<style>
+:root{--primary:hsl(264.5638 84.1808% 34.7059%);--fg:#fff;--glass:rgba(17,17,20,.62)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;font-family:Figtree,system-ui,sans-serif;color:var(--fg)}
+#viewer{position:fixed;inset:0}
+.top{position:fixed;top:20px;left:20px;right:20px;display:flex;align-items:center;gap:12px;z-index:10;pointer-events:none}
+.top .title{font-family:Poppins,sans-serif;font-weight:500;font-size:15px;padding:8px 14px;border-radius:999px;background:var(--glass);backdrop-filter:blur(12px)}
+.top .spot{margin-left:auto;font-size:14px;padding:8px 14px;border-radius:999px;background:var(--glass);backdrop-filter:blur(12px)}
+.views{pointer-events:auto;display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--glass);backdrop-filter:blur(12px);margin-left:auto}
+.views button{font:500 13px Figtree,sans-serif;color:#a1a1aa;background:transparent;border:0;padding:6px 14px;border-radius:999px;cursor:pointer}
+.views button.on{color:#111;background:#fff}
+.top .spot{margin-left:0}
+body.owner .top{right:436px}
+body.owner .brand{right:440px}
+.brand{position:fixed;right:24px;bottom:22px;z-index:10;height:26px;opacity:.92;pointer-events:none}
+#map{--h:min(58vh,520px);position:fixed;left:20px;bottom:20px;z-index:10;display:flex;flex-direction:column;align-items:center;gap:10px}
+.floors{display:flex;gap:2px;padding:3px;border-radius:999px;background:var(--glass);backdrop-filter:blur(14px)}
+.floors.one{display:none}
+.floors button{font:500 12px Figtree,sans-serif;color:#a1a1aa;background:transparent;border:0;padding:5px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:color .15s,background .15s}
+.floors button:hover{color:#fff}
+.floors button.on{color:#111;background:#fff}
+.plan{position:relative;height:var(--h)}
+#map{transition:transform .25s ease}
+.plan img,.floors{opacity:.92;transition:opacity .2s}
+#map:hover .plan img,#map:hover .floors,#map.awake .plan img,#map.awake .floors{opacity:1}
+.hide{display:none;position:absolute;top:calc(50% - 22px);right:-42px;width:32px;height:44px;border:0;border-radius:10px;background:var(--glass);backdrop-filter:blur(14px);color:#fff;cursor:pointer;place-items:center;padding:0}
+.hide svg{transition:transform .25s}
+@media (max-width:640px){
+  #map{--h:min(42vh,320px);left:12px;bottom:16px}
+  .floors button{font-size:13px;padding:8px 14px}
+  .hide{display:grid}
+  #map.off{transform:translateX(var(--off))}
+  #map.off .hide svg{transform:rotate(180deg)}
+  #map.off .floors{opacity:0;pointer-events:none}
+  .top{top:12px;left:12px;right:12px;gap:8px}
+  .top .spot{display:none}
+  .top .title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .views button{padding:6px 11px;white-space:nowrap}
+  .brand{right:14px;bottom:16px;height:20px}
+  #map.big{inset:0;left:0;bottom:0;transform:none;justify-content:center;gap:14px;z-index:20;background:rgba(0,0,0,.86);--h:78vh;overflow:hidden}
+  #map.big .plan{touch-action:none;transform-origin:0 0;transform:translate(var(--tx,0px),var(--ty,0px)) scale(var(--k,1))}
+  #map.big .plan img,#map.big .floors{opacity:1}
+  #map.big .hide{display:none}
+  #map.big .pin{transform:scale(calc(1 / var(--k,1)))}
+  #map.big .close{display:grid}
+}
+.close{display:none;position:fixed;top:14px;right:14px;z-index:21;width:40px;height:40px;border:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(14px);color:#fff;place-items:center;cursor:pointer;padding:0}
+.plan img{display:block;height:100%;width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
+.pin{position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;border:2px solid #3f3f46;cursor:pointer;padding:0;transition:transform .15s}
+.pin:hover{transform:scale(1.3)}
+.pin.on{background:var(--primary);border-color:#fff;width:18px;height:18px;margin:-9px 0 0 -9px;box-shadow:0 0 0 4px rgba(84,13,163,.25)}
+.cone{position:absolute;width:160px;height:160px;margin:-80px 0 0 -80px;pointer-events:none;z-index:1;display:none}
+.cone.show{display:block}
+.pin{z-index:2}
+.tip{position:absolute;z-index:3;transform:translate(-50%,calc(-100% - 16px));white-space:nowrap;font:500 12px Figtree,sans-serif;background:#111;color:#fff;padding:4px 9px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .12s}
+.tip.show{opacity:1}
+.hop{width:56px;height:56px;border-radius:50%;border:3px solid #fff;background:rgba(255,255,255,.22);backdrop-filter:blur(4px);cursor:pointer;transform:perspective(200px) rotateX(55deg);transition:background .15s}
+.hop:hover{background:rgba(255,255,255,.55)}
+.psv-navbar{background:transparent!important}
+</style>
+</head>
+<body>
+<div id="viewer"></div>
+<div class="top"><span class="title" id="title"></span><div class="views" id="views"><button data-v="guest">Guest view</button><button data-v="owner">Owner view</button></div><span class="spot" id="spot"></span></div>
+<img class="brand" src="logo.svg" alt="YachtWay">
+<div id="map"><div class="plan" id="plan"><img id="planImg" alt=""><svg class="cone" id="cone" viewBox="-80 -80 160 160"><defs><radialGradient id="cg" cx="0" cy="0" r="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="hsl(264.5638 84.1808% 34.7059%)" stop-opacity=".38"/><stop offset="1" stop-color="hsl(264.5638 84.1808% 34.7059%)" stop-opacity="0"/></radialGradient></defs><path d="M0 0 L-39.6 -39.6 A56 56 0 0 1 39.6 -39.6 Z" fill="url(#cg)"/></svg><div class="tip" id="tip"></div><button class="hide" id="hide" aria-label="Hide deck plan"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2.5 4.5 7 9 11.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div><div class="floors" id="floors"></div><button class="close" id="close" aria-label="Close deck plan"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+<script type="module">
+import { Viewer } from '@photo-sphere-viewer/core';
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+
+const T = await (await fetch('tour-data.json')).json();
+document.getElementById('title').textContent = T.title;
+let cur = null, shownDeck = null;
+// owner view swaps in heat panos through this hook
+let panoFor = id => 'pano/' + T.scenes[id].file;
+
+const viewer = new Viewer({
+  container: 'viewer', panorama: 'pano/' + T.scenes[T.first].file,
+  navbar: false, defaultZoomLvl: 0, mousewheelCompensation: true,
+  loadingTxt: '', plugins: [[MarkersPlugin, {}]],
+});
+const markers = viewer.getPlugin(MarkersPlugin);
+
+function showDeck(id) {
+  shownDeck = id;
+  const d = T.decks.find(d => d.id === id);
+  document.querySelectorAll('#floors button').forEach(b => b.classList.toggle('on', b.dataset.d === id));
+  document.getElementById('planImg').src = `deck_${id}.png`;
+  document.querySelectorAll('.pin').forEach(p => p.remove());
+  dispatchEvent(new CustomEvent('tour:deck', { detail: id }));
+  for (const s of Object.values(T.scenes)) {
+    if (s.deck !== id) continue;
+    const b = document.createElement('button');
+    b.className = 'pin' + (s.id === cur ? ' on' : '');
+    b.style.left = (s.map[0] / d.w * 100) + '%';
+    b.style.top = (s.map[1] / d.h * 100) + '%';
+    b.setAttribute('aria-label', s.name);
+    b.onmouseenter = () => { const t = document.getElementById('tip'); t.textContent = s.name; t.style.left = b.style.left; t.style.top = b.style.top; t.classList.add('show'); };
+    b.onmouseleave = () => document.getElementById('tip').classList.remove('show');
+    b.onclick = e => { e.stopPropagation(); closeBig(); go(s.id); };
+    document.getElementById('plan').appendChild(b);
+  }
+}
+
+// view cone: 45 deg wedge at the current pin, turned to where the user looks
+const MAP_YAW = 97;  // fitted: plan heading = yaw - rot + 97 for every link
+function updateCone(yawRad) {
+  const c = document.getElementById('cone'), s = T.scenes[cur];
+  if (!s) return;
+  const d = T.decks.find(d => d.id === s.deck);
+  c.classList.toggle('show', shownDeck === s.deck);
+  c.style.left = (s.map[0] / d.w * 100) + '%';
+  c.style.top = (s.map[1] / d.h * 100) + '%';
+  const yaw = (yawRad ?? viewer.getPosition().yaw) * 180 / Math.PI;
+  c.style.transform = `rotate(${yaw - s.rot + MAP_YAW}deg)`;
+}
+viewer.addEventListener('position-updated', e => updateCone(e.position.yaw));
+
+function setLinks(s) {
+  markers.clearMarkers();
+  for (const l of s.links) markers.addMarker({
+    id: l.id, position: { yaw: l.yaw + 'deg', pitch: l.pitch + 'deg' },
+    html: '<div class="hop"></div>', size: { width: 56, height: 56 },
+    tooltip: T.scenes[l.id].name, data: { go: l.id },
+  });
+}
+
+async function go(id, first) {
+  const s = T.scenes[id], prev = T.scenes[cur];
+  cur = id;
+  if (!first) {
+    const p = viewer.getPosition();
+    const yaw = p.yaw + (s.rot - prev.rot) * Math.PI / 180;  // keep the same heading on the boat
+    await viewer.setPanorama(await panoFor(id), { transition: { speed: 500, rotation: false, effect: 'fade' }, showLoader: false, position: { yaw, pitch: p.pitch } });
+  }
+  setLinks(s);
+  document.getElementById('spot').textContent = s.name;
+  showDeck(s.deck);
+  updateCone();
+  dispatchEvent(new CustomEvent('tour:scene', { detail: id }));
+}
+markers.addEventListener('select-marker', e => e.marker.data?.go && go(e.marker.data.go));
+
+// deck tabs: tap to go to the nearest spot on that deck
+function nearestOn(deckId) {
+  const here = T.scenes[cur], hd = T.decks.find(d => d.id === here.deck), td = T.decks.find(d => d.id === deckId);
+  const hy = here.map[1] / hd.h;
+  let best = null, bd = Infinity;
+  for (const s of Object.values(T.scenes)) {
+    if (s.deck !== deckId) continue;
+    const dist = Math.abs(s.map[1] / td.h - hy) + 0.3 * Math.abs(s.map[0] / td.w - here.map[0] / hd.w);
+    if (dist < bd) { bd = dist; best = s.id; }
+  }
+  return best;
+}
+const floors = document.getElementById('floors');
+for (const d of T.decks) {
+  const b = document.createElement('button');
+  b.textContent = d.label; b.dataset.d = d.id;
+  b.onclick = () => { if (T.scenes[cur].deck !== d.id) go(nearestOn(d.id)); };
+  floors.appendChild(b);
+}
+floors.classList.toggle('one', T.decks.length < 2);
+
+document.getElementById('hide').onclick = () => {
+  const map = document.getElementById('map');
+  if (!map.classList.contains('off'))  // slide until only the chevron is left on screen
+    map.style.setProperty('--off', -(document.getElementById('plan').getBoundingClientRect().right + 2) + 'px');
+  const off = map.classList.toggle('off');
+  document.getElementById('hide').setAttribute('aria-label', off ? 'Show deck plan' : 'Hide deck plan');
+};
+
+// touch has no hover: wake the map for a few seconds after a tap on it
+let sleepT;
+document.getElementById('map').addEventListener('touchstart', () => {
+  const m = document.getElementById('map'); m.classList.add('awake');
+  clearTimeout(sleepT); sleepT = setTimeout(() => m.classList.remove('awake'), 4000);
+}, { passive: true });
+
+// phone: tap the plan to open it full screen, pinch or double tap to zoom, drag to pan
+const mapEl = document.getElementById('map'), planEl = document.getElementById('plan');
+const phone = matchMedia('(max-width:640px)');
+let k = 1, tx = 0, ty = 0;
+function setZoom(nk, mx, my) {  // mx,my: point in the plan's own box that stays put
+  nk = Math.min(4, Math.max(1, nk));
+  tx = mx - (mx - tx) * nk / k; ty = my - (my - ty) * nk / k; k = nk;
+  if (k === 1) tx = ty = 0;
+  planEl.style.setProperty('--k', k); planEl.style.setProperty('--tx', tx + 'px'); planEl.style.setProperty('--ty', ty + 'px');
+}
+function closeBig() { mapEl.classList.remove('big'); k = 1; setZoom(1, 0, 0); }
+planEl.addEventListener('click', e => {
+  if (!phone.matches || mapEl.classList.contains('big') || mapEl.classList.contains('off') || e.target.closest('.pin,.hide')) return;
+  mapEl.classList.add('big');
+});
+document.getElementById('close').onclick = closeBig;
+const pts = new Map(); let last = null, lastTap = 0;
+const local = (x, y) => { const r = planEl.getBoundingClientRect(); return [x - r.left + tx, y - r.top + ty]; };
+planEl.addEventListener('pointerdown', e => {
+  if (!mapEl.classList.contains('big') || e.target.closest('.pin')) return;
+  pts.set(e.pointerId, [e.clientX, e.clientY]); last = null;
+  if (pts.size === 1) {
+    const now = Date.now();
+    if (now - lastTap < 300) { const [mx, my] = local(e.clientX, e.clientY); setZoom(k > 1.5 ? 1 : 2.5, mx, my); }
+    lastTap = now;
+  }
+});
+addEventListener('pointermove', e => {
+  if (!pts.has(e.pointerId)) return;
+  pts.set(e.pointerId, [e.clientX, e.clientY]);
+  const p = [...pts.values()];
+  const cx = p.reduce((a, q) => a + q[0], 0) / p.length, cy = p.reduce((a, q) => a + q[1], 0) / p.length;
+  const dist = p.length > 1 ? Math.hypot(p[0][0] - p[1][0], p[0][1] - p[1][1]) : 0;
+  if (last) {
+    tx += cx - last.cx; ty += cy - last.cy;
+    if (dist && last.dist) { const [mx, my] = local(cx, cy); setZoom(k * dist / last.dist, mx, my); }
+    else setZoom(k, 0, 0);
+  }
+  last = { cx, cy, dist };
+});
+const up = e => { pts.delete(e.pointerId); last = null; };
+addEventListener('pointerup', up); addEventListener('pointercancel', up);
+
+// viewing analytics: one sample a second (spot + view direction), sent in batches
+const TOUR = location.pathname.split('/').filter(Boolean)[0] || 'tour';
+const SID = Math.random().toString(36).slice(2, 10);
+const VID = localStorage.yw_vid ||= Math.random().toString(36).slice(2, 10);  // same browser across visits
+let buf = [];
+setInterval(() => {
+  if (document.hidden || !cur || mapEl.classList.contains('big') || owner) return;
+  const p = viewer.getPosition();
+  buf.push([cur, Math.round(p.yaw * 1800 / Math.PI) / 10, Math.round(p.pitch * 1800 / Math.PI) / 10]);
+}, 1000);
+function flush() {
+  if (!buf.length) return;
+  navigator.sendBeacon('/t', JSON.stringify({ tour: TOUR, sid: SID, vid: VID, t: Date.now(), s: buf }));
+  buf = [];
+}
+setInterval(flush, 10000);
+addEventListener('pagehide', flush);
+document.addEventListener('visibilitychange', () => document.hidden && flush());
+
+// guest / owner switch; owner view loads the analytics panel (sign-in gated in production)
+let owner = false, ownerMod = null;
+async function setView(v) {
+  owner = v === 'owner';
+  document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  document.body.classList.toggle('owner', owner);
+  const u = new URL(location); owner ? u.searchParams.set('view', 'owner') : u.searchParams.delete('view'); history.replaceState(null, '', u);
+  if (owner && !ownerMod) ownerMod = await import('./owner.js');
+  ownerMod?.toggle(owner);
+}
+document.querySelectorAll('#views button').forEach(b => b.onclick = () => setView(b.dataset.v));
+window.tour = { T, viewer, go, updateCone, get cur() { return cur; }, get deck() { return shownDeck; },
+  setPanoFor(f) { panoFor = f; }, async reload() { const p = viewer.getPosition(); await viewer.setPanorama(await panoFor(cur), { transition: { speed: 300, rotation: false, effect: 'fade' }, showLoader: false, position: p }); } };
+
+viewer.addEventListener('ready', async () => { await go(T.first, true); setView(new URLSearchParams(location.search).get('view') === 'owner' ? 'owner' : 'guest'); }, { once: true });
+</script>
+</body>
+</html>
