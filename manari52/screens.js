@@ -9,7 +9,7 @@ const CORNER = ['top-left', 'top-right', 'bottom-right', 'bottom-left'];
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
 
 const screens = window.tour.SCREENS;  // shared with the tour, so edits show in Guest view too
-let on = false, dirty = false, sel = 0, adding = null, pano = null, panoId = null;
+let on = false, dirty = false, sel = 0, adding = null, addMirror = false, pano = null, panoId = null;
 const list = () => screens[window.tour.cur] ||= [];
 
 const css = document.createElement('style');
@@ -44,7 +44,7 @@ const loupe = document.createElement('canvas'); loupe.id = 'loupe'; loupe.width 
 document.body.appendChild(loupe);
 
 function msg() {
-  if (adding) return `Tap the <b>${CORNER[adding.length]}</b> corner of the TV picture (${adding.length + 1} of 4). Zoom in for a precise tap.`;
+  if (adding) return `Tap the <b>${CORNER[adding.length]}</b> corner of the ${addMirror ? 'TV reflection in the mirror' : 'TV picture'} (${adding.length + 1} of 4). Zoom in for a precise tap.`;
   if (!list().length) return 'No TV in this spot. Turn to face the TV, then add a screen.';
   return `Drag the <b>${CORNER[sel]}</b> corner onto the edge of the picture, inside the frame. Arrow keys move it 1 px, Shift + arrow 10 px. Tab picks the next corner.`;
 }
@@ -53,15 +53,16 @@ function render() {
   el.innerHTML = `<div class="s-row"><h2>TV screens · ${esc(s.name)}</h2>
     <span class="s-sp"></span><button class="f" id="sSave" ${dirty ? '' : 'disabled'}>Save</button></div>
     <p class="s-msg">${msg()}</p>
-    <div class="s-row">${adding ? '<button id="sCancel">Cancel</button>' : `<button id="sAdd">Add screen</button>${n ? `<button id="sClip">${list().at(-1).src === SRC ? 'Upload clip' : 'Replace clip'}</button><button id="sRot" title="Turn the clip 90 degrees">Rotate clip</button><button id="sDel">Remove screen</button>` : ''}`}
+    <div class="s-row">${adding ? '<button id="sCancel">Cancel</button>' : `<button id="sAdd">Add screen</button>${list().some(sc => !sc.mirror) ? '<button id="sMir" title="The TV shows in a mirror: play the same clip there, flipped">Add reflection</button>' : ''}${n ? `${list().at(-1).mirror ? '' : `<button id="sClip">${list().at(-1).src === SRC ? 'Upload clip' : 'Replace clip'}</button><button id="sRot" title="Turn the clip 90 degrees">Rotate clip</button>`}<button id="sDel">${list().at(-1).mirror ? 'Remove reflection' : 'Remove screen'}</button>` : ''}`}
     ${n && !adding ? `<span class="s-sp"></span><div class="s-tabs">${['↖', '↗', '↘', '↙'].map((c, i) => `<button data-c="${i}" aria-pressed="${i === sel}" title="${CORNER[i]} corner">${c}</button>`).join('')}</div>` : ''}</div>`;
-  el.querySelector('#sAdd')?.addEventListener('click', () => { adding = []; document.body.classList.add('picking'); draw(); });
+  el.querySelector('#sAdd')?.addEventListener('click', () => { adding = []; addMirror = false; document.body.classList.add('picking'); draw(); });
+  el.querySelector('#sMir')?.addEventListener('click', () => { adding = []; addMirror = true; document.body.classList.add('picking'); draw(); });
   el.querySelector('#sCancel')?.addEventListener('click', () => { adding = null; document.body.classList.remove('picking'); draw(); });
   el.querySelector('#sDel')?.addEventListener('click', () => { list().pop(); dirty = true; draw(); });
   el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => { sel = +b.dataset.c; draw(); });
   el.querySelector('#sSave')?.addEventListener('click', save);
   el.querySelector('#sClip')?.addEventListener('click', () => file.click());
-  el.querySelector('#sRot')?.addEventListener('click', () => { const sc = list().at(-1); sc.rot = ((sc.rot || 0) + 1) % 4; dirty = true; draw(); });
+  el.querySelector('#sRot')?.addEventListener('click', () => { const sc = list().at(-1); sc.rot = ((sc.rot || 0) + 1) % 4; list().forEach(m => { if (m.mirror) m.rot = sc.rot; }); dirty = true; draw(); });
 }
 
 // the photographer's clip: 10 s max, shrunk by serve.py to 720p H.264 with no sound so it stays a few MB
@@ -136,7 +137,7 @@ viewer.addEventListener('click', ({ data }) => {
   if (!on || !adding || data.rightclick) return;
   adding.push([Math.round(data.textureX), Math.round(data.textureY)]);
   if (adding.length === 4) {
-    list().push({ src: SRC, corners: adding }); adding = null; sel = 0; dirty = true;
+    list().push(addMirror ? { mirror: true, corners: adding, rot: list().find(sc => !sc.mirror).rot || 0 } : { src: SRC, corners: adding }); adding = null; sel = 0; dirty = true;
     document.body.classList.remove('picking');
   }
   draw();

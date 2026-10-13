@@ -88,12 +88,9 @@ body.embed .fs{display:grid}
   .top .title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .views button{padding:6px 11px;white-space:nowrap}
   .brand{right:14px;bottom:16px;height:20px}
-  #map.big{inset:0;left:0;bottom:0;transform:none;justify-content:center;gap:14px;z-index:20;background:rgba(0,0,0,.86);--h:78vh;overflow:hidden}
-  #map.big .plan{touch-action:none;transform-origin:0 0;transform:translate(var(--tx,0px),var(--ty,0px)) scale(var(--k,1))}
-  #map.big .plan img,#map.big .floors{opacity:1}
-  #map.big ~ .hide{display:none}
-  #map.big .pin{transform:scale(calc(1 / var(--k,1)))}
-  #map.big .close{display:grid}
+  .pbox{overflow:hidden;border-radius:14px}
+  .plan{touch-action:none;transform-origin:0 0;transform:translate(var(--tx,0px),var(--ty,0px)) scale(var(--k,1))}
+  .plan .pin{transform:scale(calc(1 / var(--k,1)))}
 }
 .close{display:none;position:fixed;top:14px;right:14px;z-index:21;width:40px;height:40px;border:0;border-radius:50%;background:var(--glass);backdrop-filter:blur(14px);color:#fff;place-items:center;cursor:pointer;padding:0}
 .plan img{display:block;height:100%;width:auto;filter:drop-shadow(0 6px 18px rgba(0,0,0,.45))}
@@ -122,7 +119,7 @@ body.names .pin,body.names .hop{cursor:grab;touch-action:none}
 <button class="report" id="report">Report this website</button>
 <form class="rep" id="rep" hidden><strong>Report this website</strong><textarea id="repNote" placeholder="What is wrong with this site?" required></textarea><button>Send report</button></form>
 <a class="brand" id="brand" href="https://www.yachtway.com" target="_top" rel="noopener"><img src="logo.svg" alt="YachtWay" style="height:100%;display:block"></a>
-<div id="map"><div class="plan" id="plan"><img id="planImg" alt=""><svg class="cone" id="cone" viewBox="-80 -80 160 160"><defs><radialGradient id="cg" cx="0" cy="0" r="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="hsl(264.5638 84.1808% 34.7059%)" stop-opacity=".38"/><stop offset="1" stop-color="hsl(264.5638 84.1808% 34.7059%)" stop-opacity="0"/></radialGradient></defs><path d="M0 0 L-39.6 -39.6 A56 56 0 0 1 39.6 -39.6 Z" fill="url(#cg)"/></svg><div class="tip" id="tip"></div></div><div class="floors" id="floors"></div><button class="close" id="close" aria-label="Close deck plan"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div><button class="hide" id="hide" aria-label="Hide deck plan"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2.5 4.5 7 9 11.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<div id="map"><div class="pbox" id="pbox"><div class="plan" id="plan"><img id="planImg" alt=""><svg class="cone" id="cone" viewBox="-80 -80 160 160"><defs><radialGradient id="cg" cx="0" cy="0" r="56" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="hsl(264.5638 84.1808% 34.7059%)" stop-opacity=".38"/><stop offset="1" stop-color="hsl(264.5638 84.1808% 34.7059%)" stop-opacity="0"/></radialGradient></defs><path d="M0 0 L-39.6 -39.6 A56 56 0 0 1 39.6 -39.6 Z" fill="url(#cg)"/></svg><div class="tip" id="tip"></div></div></div><div class="floors" id="floors"></div><button class="close" id="close" aria-label="Close deck plan"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div><button class="hide" id="hide" aria-label="Hide deck plan"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2.5 4.5 7 9 11.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <script type="module">
 import { Viewer } from '@photo-sphere-viewer/core';
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
@@ -158,7 +155,7 @@ function showDeck(id) {
     b.setAttribute('aria-label', s.name); b.dataset.id = s.id;
     b.onmouseenter = () => { const t = document.getElementById('tip'); t.textContent = s.name; t.style.left = b.style.left; t.style.top = b.style.top; t.classList.add('show'); };
     b.onmouseleave = () => document.getElementById('tip').classList.remove('show');
-    b.onclick = e => { e.stopPropagation(); closeBig(); go(s.id); };
+    b.onclick = e => { e.stopPropagation(); go(s.id); };
     document.getElementById('plan').appendChild(b);
   }
 }
@@ -220,11 +217,12 @@ function fixWrap(m) {
   const h = lr < ir ? 1 - lr / ir : 0, w = lr > ir ? 1 - ir / lr : 0;
   r.set(1 - h, 1 - w); mat.offset.set(h / 2, w / 2); viewer.needsUpdate();
 }
-const screenPos = sc => sc.corners.map((_, i) => sc.corners[(i + 4 - (sc.rot || 0)) % 4]).map(([x, y]) => ({ textureX: x, textureY: y }));
+// mirror: a reflection of a TV; the corners are swapped left to right so the picture shows flipped, as in a real mirror
+const screenPos = sc => { const c = sc.corners.map((_, i) => sc.corners[(i + 4 - (sc.rot || 0)) % 4]); return (sc.mirror ? [c[1], c[0], c[3], c[2]] : c).map(([x, y]) => ({ textureX: x, textureY: y })); };
 // download and decode the next rooms' TV clips ahead of time, so the TV is on the wall the moment the room shows
 const warm = new Map();  // src -> muted <video> on a blob URL, first frame decoded
 function warmClips(id) {
-  for (const sc of SCREENS[id] || []) if (!warm.has(sc.src)) {
+  for (const sc of SCREENS[id] || []) if (sc.src && !warm.has(sc.src)) {
     warm.set(sc.src, null);
     fetch(sc.src).then(r => r.ok ? r.blob() : Promise.reject()).then(b => {
       const v = document.createElement('video');
@@ -239,13 +237,26 @@ function dropScreens() {
 }
 function showScreens(list) {
   dropScreens();
-  list.forEach((sc, i) => {
+  const tv = list.find(sc => !sc.mirror);
+  // TVs first, then reflections, which reuse the TV's video so both show the same frame
+  [...list.entries()].sort((a, b) => !!a[1].mirror - !!b[1].mirror).forEach(([i, sc]) => {
+    if (sc.mirror && !tv) return;
     const id = 'screen' + i;
-    const wv = warm.get(sc.src);
+    const src = sc.mirror ? tv.src : sc.src, wv = warm.get(src);
     screenIds.push(id);
-    markers.addMarker({ id, videoLayer: wv ? wv.src : sc.src, autoplay: false, position: screenPos(sc) }, false);
+    markers.addMarker({ id, videoLayer: wv ? wv.src : src, autoplay: false, position: screenPos(sc) }, false);
     viewer.needsContinuousUpdate(false);
     const m = markers.getMarker(id), mat = m.threeMesh.material;
+    if (sc.mirror) {
+      const t = mat.map; t.image.removeAttribute('src'); t.image.load(); t.dispose();
+      mat.map = markers.getMarker('screen' + list.indexOf(tv)).threeMesh.material.map;
+      mat.side = 2; mat.needsUpdate = true;  // swapped corners turn the quad around; draw its back face too
+      fixPersp(m);
+      const a = mat.uniforms.alpha, v = m.video;
+      const ready = () => { if (!screenIds.includes(id)) return; fixWrap(markers.getMarker(id)); a.value = .85; viewer.needsUpdate(); playVisible(); };
+      if (v.readyState >= 2) ready(); else { a.value = 0; v.addEventListener('loadeddata', ready, { once: true }); }
+      return;
+    }
     if (wv) {  // swap in the warmed video so there is no load gap
       const t = mat.map; t.image.removeAttribute('src'); t.image.load();
       mat.map = new t.constructor(wv); mat.map.colorSpace = t.colorSpace; t.dispose();
@@ -262,11 +273,14 @@ function showScreens(list) {
   playVisible();
 }
 function playVisible() {
+  const seen = new Map();  // a TV and its reflection share one video: play it while either is in view
   for (const id of screenIds) {
-    const m = markers.getMarker(id), v = m.video;
-    const seen = !document.hidden && viewer.renderer.isObjectVisible(m.threeMesh);
-    if (seen && v.paused && v.readyState >= 2) v.play().catch(() => {});
-    else if (!seen && !v.paused) v.pause();
+    const m = markers.getMarker(id);
+    seen.set(m.video, seen.get(m.video) || (!document.hidden && viewer.renderer.isObjectVisible(m.threeMesh)));
+  }
+  for (const [v, on] of seen) {
+    if (on && v.paused && v.readyState >= 2) v.play().catch(() => {});
+    else if (!on && !v.paused) v.pause();
   }
 }
 viewer.addEventListener('position-updated', playVisible);
@@ -333,13 +347,13 @@ floors.classList.toggle('one', T.decks.length < 2);
 const hideBtn = document.getElementById('hide');
 const placeHide = () => {
   const map = document.getElementById('map'), off = map.classList.contains('off');
-  const r = (floors.offsetWidth ? floors : document.getElementById('plan')).getBoundingClientRect();
+  const r = (floors.offsetWidth ? floors : document.getElementById('pbox')).getBoundingClientRect();
   hideBtn.style.setProperty('--hl', off ? '12px' : (r.right - new DOMMatrix(getComputedStyle(map).transform).m41 + 8) + 'px');  // m41: map may still be sliding back
 };
 hideBtn.onclick = () => {
   const map = document.getElementById('map');
   if (!map.classList.contains('off'))  // slide the plan and tabs fully off screen
-    map.style.setProperty('--off', -(Math.max(floors.getBoundingClientRect().right, document.getElementById('plan').getBoundingClientRect().right) + 2) + 'px');
+    map.style.setProperty('--off', -(Math.max(floors.getBoundingClientRect().right, document.getElementById('pbox').getBoundingClientRect().right) + 2) + 'px');
   const off = map.classList.toggle('off');
   hideBtn.classList.toggle('off', off);
   hideBtn.setAttribute('aria-label', off ? 'Show deck plan' : 'Hide deck plan');
@@ -354,26 +368,22 @@ document.getElementById('map').addEventListener('touchstart', () => {
   clearTimeout(sleepT); sleepT = setTimeout(() => m.classList.remove('awake'), 4000);
 }, { passive: true });
 
-// phone: tap the plan to open it full screen, pinch or double tap to zoom, drag to pan
+// phone: pinch or double tap the plan to zoom it where it sits, drag to pan while zoomed
 const mapEl = document.getElementById('map'), planEl = document.getElementById('plan');
 const phone = matchMedia('(max-width:640px)');
 let k = 1, tx = 0, ty = 0;
 function setZoom(nk, mx, my) {  // mx,my: point in the plan's own box that stays put
   nk = Math.min(4, Math.max(1, nk));
   tx = mx - (mx - tx) * nk / k; ty = my - (my - ty) * nk / k; k = nk;
-  if (k === 1) tx = ty = 0;
+  const w = planEl.offsetWidth, h = planEl.offsetHeight;  // keep the zoomed plan filling its box
+  tx = Math.min(0, Math.max(w * (1 - k), tx)); ty = Math.min(0, Math.max(h * (1 - k), ty));
   planEl.style.setProperty('--k', k); planEl.style.setProperty('--tx', tx + 'px'); planEl.style.setProperty('--ty', ty + 'px');
 }
-function closeBig() { mapEl.classList.remove('big'); k = 1; setZoom(1, 0, 0); }
-planEl.addEventListener('click', e => {
-  if (!phone.matches || mapEl.classList.contains('big') || mapEl.classList.contains('off') || e.target.closest('.pin,.hide')) return;
-  mapEl.classList.add('big');
-});
-document.getElementById('close').onclick = closeBig;
+document.getElementById('planImg').addEventListener('load', () => { k = 1; setZoom(1, 0, 0); });  // new deck starts unzoomed
 const pts = new Map(); let last = null, lastTap = 0;
 const local = (x, y) => { const r = planEl.getBoundingClientRect(); return [x - r.left + tx, y - r.top + ty]; };
 planEl.addEventListener('pointerdown', e => {
-  if (!mapEl.classList.contains('big') || e.target.closest('.pin')) return;
+  if (!phone.matches) return;  // fingers on a pin count too; a plain tap still opens the spot
   pts.set(e.pointerId, [e.clientX, e.clientY]); last = null;
   if (pts.size === 1) {
     const now = Date.now();
@@ -388,7 +398,7 @@ addEventListener('pointermove', e => {
   const cx = p.reduce((a, q) => a + q[0], 0) / p.length, cy = p.reduce((a, q) => a + q[1], 0) / p.length;
   const dist = p.length > 1 ? Math.hypot(p[0][0] - p[1][0], p[0][1] - p[1][1]) : 0;
   if (last) {
-    tx += cx - last.cx; ty += cy - last.cy;
+    if (k > 1 || p.length > 1) { tx += cx - last.cx; ty += cy - last.cy; }
     if (dist && last.dist) { const [mx, my] = local(cx, cy); setZoom(k * dist / last.dist, mx, my); }
     else setZoom(k, 0, 0);
   }
