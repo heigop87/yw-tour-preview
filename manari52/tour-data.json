@@ -1,0 +1,344 @@
+{
+ "title": "Manari 52",
+ "first": "CAM06625G6-PR0019-PAN001",
+ "decks": [
+  {
+   "id": "0",
+   "label": "Main deck",
+   "w": 758,
+   "h": 2614,
+   "mapYaw": 7.0
+  },
+  {
+   "id": "-1",
+   "label": "Lower deck",
+   "w": 780,
+   "h": 2563,
+   "mapYaw": 7.0,
+   "start": "CAM06625G6-PR0019-PAN017"
+  }
+ ],
+ "scenes": {
+  "CAM06625G6-PR0019-PAN001": {
+   "id": "CAM06625G6-PR0019-PAN001",
+   "name": "Aft deck",
+   "deck": "0",
+   "file": "Aft_deck_PAN001.jpg",
+   "rot": 348.95,
+   "map": [
+    121.1,
+    2316.2
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN003",
+     "yaw": 49.7,
+     "pitch": -21.5
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN007",
+     "yaw": -13.4,
+     "pitch": -13.6
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN003": {
+   "id": "CAM06625G6-PR0019-PAN003",
+   "name": "Aft deck",
+   "deck": "0",
+   "file": "Aft_deck_PAN003.jpg",
+   "rot": 13.3,
+   "map": [
+    636.3,
+    2105.9
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN001",
+     "yaw": -105.9,
+     "pitch": -21.5
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN005",
+     "yaw": 5.2,
+     "pitch": -20.8
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN007",
+     "yaw": -35.5,
+     "pitch": -16.0
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN005": {
+   "id": "CAM06625G6-PR0019-PAN005",
+   "name": "Galley",
+   "deck": "0",
+   "file": "Galley_PAN005.jpg",
+   "rot": 18.49,
+   "map": [
+    618.6,
+    1600.5
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN011",
+     "yaw": 18.7,
+     "pitch": -37.3
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN009",
+     "yaw": -29.4,
+     "pitch": -30.3
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN007",
+     "yaw": -79.4,
+     "pitch": -23.8
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN003",
+     "yaw": -169.6,
+     "pitch": -20.8
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN007": {
+   "id": "CAM06625G6-PR0019-PAN007",
+   "name": "Galley",
+   "deck": "0",
+   "file": "Galley_PAN007.jpg",
+   "rot": 352.97,
+   "map": [
+    128.4,
+    1607.9
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN009",
+     "yaw": 26.9,
+     "pitch": -29.6
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN005",
+     "yaw": 80.3,
+     "pitch": -24.3
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN011",
+     "yaw": 47.2,
+     "pitch": -19.8
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN003",
+     "yaw": 124.2,
+     "pitch": -16.0
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN009": {
+   "id": "CAM06625G6-PR0019-PAN009",
+   "name": "Helm",
+   "deck": "0",
+   "file": "Helm_PAN009.jpg",
+   "rot": 355.79,
+   "map": [
+    376.9,
+    1343.5
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN011",
+     "yaw": 78.3,
+     "pitch": -37.9
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN005",
+     "yaw": 127.9,
+     "pitch": -30.3
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN007",
+     "yaw": -150.3,
+     "pitch": -29.6
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN011": {
+   "id": "CAM06625G6-PR0019-PAN011",
+   "name": "Helm",
+   "deck": "0",
+   "file": "Helm_PAN011.jpg",
+   "rot": 20.49,
+   "map": [
+    654.2,
+    1341.3
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN009",
+     "yaw": -77.0,
+     "pitch": -37.9
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN005",
+     "yaw": -159.3,
+     "pitch": -37.3
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN007",
+     "yaw": -105.3,
+     "pitch": -19.8
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN013": {
+   "id": "CAM06625G6-PR0019-PAN013",
+   "name": "Bow lounge",
+   "deck": "0",
+   "file": "Bow_lounge_PAN013.jpg",
+   "rot": 80.41,
+   "map": [
+    412.3,
+    412.9
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN015",
+     "yaw": -29.6,
+     "pitch": -35.4
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN015": {
+   "id": "CAM06625G6-PR0019-PAN015",
+   "name": "Bow lounge",
+   "deck": "0",
+   "file": "Bow_lounge_PAN015.jpg",
+   "rot": 149.43,
+   "map": [
+    177.1,
+    563.2
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN013",
+     "yaw": -140.5,
+     "pitch": -35.4
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN017": {
+   "id": "CAM06625G6-PR0019-PAN017",
+   "name": "Below deck",
+   "deck": "-1",
+   "file": "Below_deck_PAN017.jpg",
+   "rot": 342.05,
+   "map": [
+    350.1,
+    1039.3
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN023",
+     "yaw": 66.5,
+     "pitch": -45.8
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN021",
+     "yaw": 138.7,
+     "pitch": -39.2
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN019",
+     "yaw": -14.4,
+     "pitch": -26.8
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN019": {
+   "id": "CAM06625G6-PR0019-PAN019",
+   "name": "Owners fwd",
+   "deck": "-1",
+   "file": "Owners_fwd_PAN019.jpg",
+   "rot": 358.75,
+   "map": [
+    428.1,
+    652.8
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN017",
+     "yaw": -177.7,
+     "pitch": -26.8
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN023",
+     "yaw": 154.5,
+     "pitch": -25.9
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN021",
+     "yaw": 172.1,
+     "pitch": -17.8
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN021": {
+   "id": "CAM06625G6-PR0019-PAN021",
+   "name": "Guest cabin",
+   "deck": "-1",
+   "file": "Guest_cabin_PAN021.jpg",
+   "rot": 173.28,
+   "map": [
+    424.4,
+    1273.7
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN017",
+     "yaw": 150.0,
+     "pitch": -39.2
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN023",
+     "yaw": -165.1,
+     "pitch": -37.3
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN019",
+     "yaw": 166.6,
+     "pitch": -17.8
+    }
+   ]
+  },
+  "CAM06625G6-PR0019-PAN023": {
+   "id": "CAM06625G6-PR0019-PAN023",
+   "name": "Head",
+   "deck": "-1",
+   "file": "Head_PAN023.jpg",
+   "rot": 265.7,
+   "map": [
+    560.1,
+    1044.2
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0019-PAN017",
+     "yaw": 170.1,
+     "pitch": -45.8
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN021",
+     "yaw": 107.3,
+     "pitch": -37.3
+    },
+    {
+     "id": "CAM06625G6-PR0019-PAN019",
+     "yaw": -118.6,
+     "pitch": -25.9
+    }
+   ]
+  }
+ }
+}
