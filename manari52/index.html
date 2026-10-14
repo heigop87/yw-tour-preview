@@ -40,13 +40,16 @@ html,body{margin:0;height:100%;background:#000;font-family:Figtree,system-ui,san
 .top .spot{margin-left:0}
 body.owner .top,body.names .top{right:456px}
 body.owner .brand,body.names .brand{right:460px}
-.views button[data-v=names],.views button[data-v=screens]{display:none}
-body.can-name .views button[data-v=names],body.can-name .views button[data-v=screens]{display:block}
+.views button[data-v=shoot]{display:none}
+body.can-name .views button[data-v=shoot]{display:block}
+.tools{display:none;position:fixed;top:68px;left:20px;z-index:10}
+body.names .tools,body.screens .tools,body.measure .tools{display:flex}
+body.embed .tools{display:none}
 .brand{position:fixed;right:24px;bottom:22px;z-index:10;height:26px;opacity:.92;pointer-events:none}
 body.embed .views{display:none}
 body.embed .brand{pointer-events:auto}
 .share{pointer-events:auto;font:500 13px Figtree,sans-serif;color:#fff;border:0;padding:9px 14px;border-radius:999px;background:var(--glass);backdrop-filter:blur(12px);cursor:pointer}
-body.owner .share,body.names .share,body.screens .share,body.embed .share{display:none}
+body.owner .share,body.names .share,body.screens .share,body.measure .share,body.embed .share{display:none}
 .sheet{position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:20px}
 .sheet[hidden]{display:none}
 .sheet-card{width:min(520px,100%);max-height:86vh;overflow:auto;background:#f2f2f5;color:#121216;border-radius:20px;padding:20px}
@@ -114,7 +117,8 @@ body.names .pin,body.names .hop{cursor:grab;touch-action:none}
 <body>
 <noscript><h1>Eureka Yachts Manari 52 virtual tour by YachtWay</h1><p>Walk through the Eureka Yachts Manari 52 in a 360 virtual tour by YachtWay: 12 spots across main deck, lower deck, with a deck map to move between them.</p><ul><li><a href="pano/Aft_deck_PAN001.jpg">Aft deck</a></li><li><a href="pano/Aft_deck_PAN003.jpg">Aft deck</a></li><li><a href="pano/Galley_PAN005.jpg">Galley</a></li><li><a href="pano/Galley_PAN007.jpg">Galley</a></li><li><a href="pano/Helm_PAN009.jpg">Helm</a></li><li><a href="pano/Helm_PAN011.jpg">Helm</a></li><li><a href="pano/Bow_lounge_PAN013.jpg">Bow lounge</a></li><li><a href="pano/Bow_lounge_PAN015.jpg">Bow lounge</a></li><li><a href="pano/Below_deck_PAN017.jpg">Below deck</a></li><li><a href="pano/Owners_fwd_PAN019.jpg">Owners fwd</a></li><li><a href="pano/Guest_cabin_PAN021.jpg">Guest cabin</a></li><li><a href="pano/Head_PAN023.jpg">Head</a></li></ul></noscript>
 <div id="viewer"></div>
-<div class="top"><span class="title" id="title"></span><div class="views" id="views"><button data-v="guest">Guest view</button><button data-v="owner">Owner view</button><button data-v="names">Names</button><button data-v="screens">Screens</button></div><span class="spot" id="spot"></span><button class="share" id="share">Share</button><button class="fs" id="fs" aria-label="Full screen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path class="o" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="c" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button></div>
+<div class="views tools" id="tools"><button data-v="names">Names</button><button data-v="screens">TVs</button><button data-v="measure">Measure</button></div>
+<div class="top"><span class="title" id="title"></span><div class="views" id="views"><button data-v="guest">Guest view</button><button data-v="owner">Owner view</button><button data-v="shoot">Shoot</button></div><span class="spot" id="spot"></span><button class="share" id="share">Share</button><button class="fs" id="fs" aria-label="Full screen"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path class="o" d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/><path class="c" d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button></div>
 <div class="sheet" id="sheet" hidden><div class="sheet-card"><div class="sheet-head"><h2>Share this tour</h2><button class="sheet-x" id="sheetX" aria-label="Close">&times;</button></div><div id="sheetBody"></div></div></div>
 <button class="report" id="report">Report this website</button>
 <form class="rep" id="rep" hidden><strong>Report this website</strong><textarea id="repNote" placeholder="What is wrong with this site?" required></textarea><button>Send report</button></form>
@@ -452,21 +456,28 @@ document.addEventListener('visibilitychange', () => document.hidden && flush());
 
 // guest / owner switch; owner view loads the analytics panel (sign-in gated in production)
 // names: photographer tool for naming spots, only offered when the link has ?view=names
-let ownerMod = null, namesMod = null, screensMod = null;
+let ownerMod = null, namesMod = null, screensMod = null, measureMod = null, lastTool = 'names';
+const TOOLS = ['names', 'screens', 'measure'];
 async function setView(v) {
-  document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  if (v === 'shoot') v = lastTool;
+  if (TOOLS.includes(v)) lastTool = v;
+  document.querySelectorAll('#views button').forEach(b => b.classList.toggle('on', b.dataset.v === (TOOLS.includes(v) ? 'shoot' : v)));
+  document.querySelectorAll('#tools button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   document.body.classList.toggle('owner', v === 'owner');
   document.body.classList.toggle('names', v === 'names');
   const u = new URL(location); v === 'guest' ? u.searchParams.delete('view') : u.searchParams.set('view', v); history.replaceState(null, '', u);
   if (v === 'owner' && !ownerMod) ownerMod = await import('./owner.js');
   if (v === 'names' && !namesMod) namesMod = await import('./names.js');
   if (v === 'screens' && !screensMod) screensMod = await import('./screens.js');
+  if (v === 'measure' && !measureMod) measureMod = await import('./measure.js');
   ownerMod?.toggle(v === 'owner');
   namesMod?.toggle(v === 'names');
   document.body.classList.toggle('screens', v === 'screens');
   screensMod?.toggle(v === 'screens');
+  document.body.classList.toggle('measure', v === 'measure');
+  measureMod?.toggle(v === 'measure');
 }
-document.querySelectorAll('#views button').forEach(b => b.onclick = () => setView(b.dataset.v));
+document.querySelectorAll('#views button,#tools button').forEach(b => b.onclick = () => setView(b.dataset.v));
 // guests can share the link or put the tour on their own site; every host shows up in the YachtWay embeds list
 const sheet = document.getElementById('sheet');
 document.getElementById('share').onclick = async () => {
@@ -488,7 +499,9 @@ rep.onsubmit = e => {
 window.tour = { T, viewer, go, updateCone, showScreens, screenPos, fixWrap, SCREENS, setScreens(o) { Object.keys(SCREENS).forEach(k => delete SCREENS[k]); Object.assign(SCREENS, o); }, get cur() { return cur; }, get deck() { return shownDeck; },
   setPanoFor(f) { panoFor = f; }, relabel() { setLinks(T.scenes[cur]); document.getElementById('spot').textContent = T.scenes[cur].name; }, async reload() { const p = viewer.getPosition(); await viewer.setPanorama(await panoFor(cur), { transition: { speed: 300, rotation: false, effect: 'fade' }, showLoader: false, position: p }); } };
 
-viewer.addEventListener('ready', async () => { await go(T.first, true); const v = new URLSearchParams(location.search).get('view'); document.body.classList.toggle('can-name', ['names', 'screens'].includes(v)); setView(!EMBED && ['owner', 'names', 'screens'].includes(v) ? v : 'guest'); }, { once: true });
+viewer.addEventListener('ready', async () => { await go(T.first, true); const v = new URLSearchParams(location.search).get('view'); document.body.classList.toggle('can-name', ['names', 'screens', 'measure', 'shoot'].includes(v)); setView(!EMBED && ['owner', 'names', 'screens', 'measure', 'shoot'].includes(v) ? v : 'guest');
+  // saved measurements show to guests as thin lines with a label
+  if (!measureMod && await fetch('measures.json', { method: 'HEAD' }).then(r => r.ok).catch(() => false)) measureMod ||= await import('./measure.js'); }, { once: true });
 </script>
 </body>
 </html>
