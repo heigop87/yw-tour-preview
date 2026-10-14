@@ -32,13 +32,15 @@ const HOWTO = [
   ['Any other site', ['Open the page HTML where the tour should show.', 'Paste the code there and publish.', 'Or send the code to whoever runs your website.']],
 ];
 
-export function embedPanel(el, { name, url, preview, guest }) {
+export function embedPanel(el, { name, url, preview, guest, spot, spotName }) {
   // phones always get a tall box: the 360 view reads better portrait than as a 16:9 strip
   const code = () => `<style>.yw-tour{position:relative;width:100%;aspect-ratio:16/9}@media (max-width:700px){.yw-tour{aspect-ratio:auto;height:80vh}}</style>
 <div class="yw-tour"><iframe src="${url}?embed=1" title="${esc(name)} 360 virtual tour" style="position:absolute;inset:0;width:100%;height:100%;border:0;border-radius:12px" loading="lazy" allow="fullscreen; autoplay; xr-spatial-tracking" allowfullscreen></iframe></div>
 <p style="font:14px/1.4 sans-serif;margin:8px 0 0"><a href="${url}">${esc(name)} 360 virtual tour</a> by <a href="https://www.yachtway.com">YachtWay</a></p>`;
   const render = () => {
     el.innerHTML = `<div class="ye">
+      ${spot ? `<section><h3>Share this spot</h3><p>The link opens the tour in the ${esc(spotName.toLowerCase())}, facing the way you are looking now.</p>
+        <div class="ye-row"><button class="ye-btn f" data-c="spot">Copy link to this spot</button></div></section>` : ''}
       <section><h3>Put this tour on your website</h3>
         <p>Copy the code and paste it into any page. The tour plays right on your page, fills a tall screen on phones, and the link under it opens the full tour on YachtWay.</p>
         <p class="ye-hint"><a href="embed-preview.html?name=${encodeURIComponent(name)}" target="_blank" rel="noopener">See how it looks on a website</a></p>
@@ -50,7 +52,7 @@ export function embedPanel(el, { name, url, preview, guest }) {
       <section><p>Do not modify the code or the link for the tour to work.</p></section></div>`;
     el.querySelectorAll('[data-c]').forEach(b => b.onclick = () => {
       const label = b.textContent;
-      navigator.clipboard.writeText(b.dataset.c === 'code' ? code() : url).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = label, 1500); });
+      navigator.clipboard.writeText(b.dataset.c === 'code' ? code() : b.dataset.c === 'spot' ? spot : url).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = label, 1500); });
     });
   };
   render();
