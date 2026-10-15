@@ -231,6 +231,23 @@ function fixWrap(m) {
   const h = lr < ir ? 1 - lr / ir : 0, w = lr > ir ? 1 - ir / lr : 0;
   r.set(1 - h, 1 - w); mat.offset.set(h / 2, w / 2); viewer.needsUpdate();
 }
+// glass: a lit room reflects in a real TV, so the clip gets the panel's lifted blacks, a soft sheen from the
+// top left, a faint diagonal streak and darker edges. Reflections (mirror) are left as they are.
+function glass(mat) {
+  if (mat.userData.glass) return;
+  mat.userData.glass = true;
+  mat.vertexShader = mat.vertexShader.replace('varying vec2 vUv;', 'varying vec2 vUv;\nvarying vec2 vQ;').replace('vUv = uv * repeat + offset;', 'vUv = uv * repeat + offset;\n    vQ = uv;');
+  mat.fragmentShader = mat.fragmentShader.replace('varying vec2 vUv;', 'varying vec2 vUv;\nvarying vec2 vQ;').replace(/}\s*$/, `
+    vec3 c = gl_FragColor.rgb * .9 + vec3(.022, .026, .032);
+    float e = min(min(vQ.x, 1. - vQ.x), min(vQ.y, 1. - vQ.y));
+    c *= mix(.84, 1., smoothstep(0., .12, e));
+    float sheen = .2 * pow(clamp(1. - length(vec2(vQ.x, 1. - vQ.y) * vec2(.9, 1.2)), 0., 1.), 1.6);
+    float streak = .13 * exp(-pow((vQ.x + (1. - vQ.y) * .55 - .62) * 7., 2.));
+    gl_FragColor.rgb = 1. - (1. - c) * (1. - vec3(sheen + streak));
+}
+`);
+  mat.needsUpdate = true;
+}
 // mirror: a reflection of a TV; the corners are swapped left to right so the picture shows flipped, as in a real mirror
 const screenPos = sc => { const c = sc.corners.map((_, i) => sc.corners[(i + 4 - (sc.rot || 0)) % 4]); return (sc.mirror ? [c[1], c[0], c[3], c[2]] : c).map(([x, y]) => ({ textureX: x, textureY: y })); };
 // download and decode the next rooms' TV clips ahead of time, so the TV is on the wall the moment the room shows
@@ -276,6 +293,7 @@ function showScreens(list) {
       mat.map = new t.constructor(wv); mat.map.colorSpace = t.colorSpace; t.dispose();
     }
     const v = m.video; v.preload = 'auto'; v.loop = true;
+    glass(mat);
     fixPersp(m);
     const a = mat.uniforms.alpha;
     const ready = () => { if (!screenIds.includes(id)) return; fixWrap(markers.getMarker(id)); a.value = 1; viewer.needsUpdate(); playVisible(); };
@@ -498,7 +516,10 @@ document.getElementById('share').onclick = async () => {
   const url = document.querySelector('link[rel=canonical]')?.href || location.origin + location.pathname;
   const p = viewer.getPosition(), deg = r => Math.round(r * 180 / Math.PI);
   const spot = `${url}?s=${cur.split('-').at(-1)}&look=${deg(p.yaw)},${deg(p.pitch)}`;
-  embedPanel(document.getElementById('sheetBody'), { name: T.title, url, guest: true, spot, spotName: T.scenes[cur].name });
+  const body = document.getElementById('sheetBody');
+  body.innerHTML = '<div id="clipBox"></div><div id="embedBox"></div>';
+  embedPanel(document.getElementById('embedBox'), { name: T.title, url, guest: true, spot, spotName: T.scenes[cur].name });
+  import('./clip.js').then(m => m.clipPanel(document.getElementById('clipBox'), { T, url })).catch(() => {});
   sheet.hidden = false;
 };
 document.getElementById('sheetX').onclick = () => sheet.hidden = true;
