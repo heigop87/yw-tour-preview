@@ -1,0 +1,262 @@
+{
+ "title": "Vanquish VQ55 Sports Line",
+ "first": "CAM06625G6-PR0020-PAN004",
+ "decks": [
+  {
+   "id": "0",
+   "label": "Main deck",
+   "w": 374,
+   "h": 1288,
+   "mapYaw": 7.0,
+   "start": "CAM06625G6-PR0020-PAN004"
+  },
+  {
+   "id": "-1",
+   "label": "Lower deck",
+   "w": 370,
+   "h": 1281,
+   "mapYaw": 7.0,
+   "look": 22,
+   "start": "CAM06625G6-PR0020-PAN001"
+  }
+ ],
+ "scenes": {
+  "CAM06625G6-PR0020-PAN004": {
+   "id": "CAM06625G6-PR0020-PAN004",
+   "name": "Swim platform",
+   "deck": "0",
+   "file": "Terrace_PAN004.jpg",
+   "rot": 25.77,
+   "map": [
+    307.4,
+    1188.4
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN005",
+     "yaw": 32.6,
+     "pitch": -18.9
+    }
+   ]
+  },
+  "CAM06625G6-PR0020-PAN005": {
+   "id": "CAM06625G6-PR0020-PAN005",
+   "name": "Aft deck",
+   "deck": "0",
+   "file": "Room_PAN005.jpg",
+   "rot": 126.36,
+   "map": [
+    294.4,
+    833.5
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN006",
+     "yaw": 84.3,
+     "pitch": -32.1
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN008",
+     "yaw": 120.5,
+     "pitch": -19.8
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN004",
+     "yaw": -62.9,
+     "pitch": -17.4
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN011",
+     "yaw": 81.3,
+     "pitch": -15.9
+    }
+   ]
+  },
+  "CAM06625G6-PR0020-PAN006": {
+   "id": "CAM06625G6-PR0020-PAN006",
+   "name": "Cockpit",
+   "deck": "0",
+   "file": "Room_PAN006.jpg",
+   "rot": 92.84,
+   "map": [
+    191.7,
+    741.5
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN005",
+     "yaw": -129.2,
+     "pitch": -32.1
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN008",
+     "yaw": 119.2,
+     "pitch": -29.5
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN011",
+     "yaw": 45.3,
+     "pitch": -27.5
+    }
+   ]
+  },
+  "CAM06625G6-PR0020-PAN008": {
+   "id": "CAM06625G6-PR0020-PAN008",
+   "name": "Helm starboard",
+   "deck": "0",
+   "file": "Balcony_PAN008.jpg",
+   "rot": 90.03,
+   "map": [
+    316.1,
+    598.9
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN006",
+     "yaw": -63.6,
+     "pitch": -29.5
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN011",
+     "yaw": -7.4,
+     "pitch": -24.2
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN005",
+     "yaw": -95.8,
+     "pitch": -19.8
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN009",
+     "yaw": 80.9,
+     "pitch": -18.3
+    }
+   ]
+  },
+  "CAM06625G6-PR0020-PAN009": {
+   "id": "CAM06625G6-PR0020-PAN009",
+   "name": "Bow lounge starboard",
+   "deck": "0",
+   "file": "Room_PAN009.jpg",
+   "rot": 62.46,
+   "map": [
+    289.5,
+    314.7
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN008",
+     "yaw": -126.7,
+     "pitch": -18.3
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN011",
+     "yaw": -89.8,
+     "pitch": -15.1
+    }
+   ]
+  },
+  "CAM06625G6-PR0020-PAN011": {
+   "id": "CAM06625G6-PR0020-PAN011",
+   "name": "Helm port",
+   "deck": "0",
+   "file": "Balcony_PAN011.jpg",
+   "rot": 267.46,
+   "map": [
+    61.7,
+    593.4
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN006",
+     "yaw": 39.9,
+     "pitch": -27.5
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN008",
+     "yaw": -9.9,
+     "pitch": -24.2
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN005",
+     "yaw": 42.4,
+     "pitch": -15.9
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN009",
+     "yaw": -64.8,
+     "pitch": -15.1
+    }
+   ]
+  },
+  "CAM06625G6-PR0020-PAN001": {
+   "id": "CAM06625G6-PR0020-PAN001",
+   "name": "Main saloon",
+   "deck": "-1",
+   "file": "Room_PAN001.jpg",
+   "rot": 357.59,
+   "map": [
+    201.4,
+    392.9
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN002",
+     "yaw": -104.2,
+     "pitch": -57.8
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN003",
+     "yaw": 175.0,
+     "pitch": -34.0
+    }
+   ]
+  },
+  "CAM06625G6-PR0020-PAN002": {
+   "id": "CAM06625G6-PR0020-PAN002",
+   "name": "Head",
+   "deck": "-1",
+   "file": "Half-Bath_PAN002.jpg",
+   "rot": 89.53,
+   "map": [
+    127.3,
+    398.8
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN001",
+     "yaw": 167.7,
+     "pitch": -57.8
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN003",
+     "yaw": -117.3,
+     "pitch": -33.4
+    }
+   ]
+  },
+  "CAM06625G6-PR0020-PAN003": {
+   "id": "CAM06625G6-PR0020-PAN003",
+   "name": "Guest cabin",
+   "deck": "-1",
+   "file": "Bedroom_PAN003.jpg",
+   "rot": 183.63,
+   "map": [
+    187.9,
+    557.1
+   ],
+   "links": [
+    {
+     "id": "CAM06625G6-PR0020-PAN001",
+     "yaw": -178.9,
+     "pitch": -34.0
+    },
+    {
+     "id": "CAM06625G6-PR0020-PAN002",
+     "yaw": 156.8,
+     "pitch": -33.4
+    }
+   ]
+  }
+ }
+}
